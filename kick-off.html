@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>kick-off</title>
+</head>
+<body>
+    <script>
+        /**
+         * Exercise 12
+         * 
+         * Write a class called 'EventListener'
+         * 
+         * This class has three methods one called 'addEvent', one called 'removeEvent'
+         * and one called 'emitEvent'.
+         * 
+         * 'addEvent' takes two arguments: the name of event and a callback for the event.
+         * obj.addEvent('name-of-event', () => {})
+         * 
+         * 'removeEvent' takes two arguemnts: the name of the event 
+         *  and the callback to remove.
+         * 
+         * 
+         * Only removes the given callback from the event.
+         * obj.removeEvent('name-of-event', () => {})
+         * 
+         * 'emitEvent' takes one arguemnt: the name of the event to emit.
+         * obj.emitEvent('name-of-event')
+         */
+
+
+        class EventEmitter2 {
+
+            // need the contructor but does not pass down any value 
+            constructor() {
+                this.thing = {}
+            }
+            
+
+            // save the function for the name 
+            // {event: funtion}
+            addEvent(event, fn) {
+                
+                if(this.thing.hasOwnProperty(event) === false){
+                    this.thing[event] = []
+                }
+                this.thing[event].push(fn)
+                
+                // console.log('fn:', this.thing[event])
+                // console.log('obj:', obj)
+            }
+
+            // check to see if event has been added, if not, igore it
+            emitEvent(event) {
+                if(this.thing.hasOwnProperty(event)){
+                    for (let element of this.thing[event]){
+                        element()
+                    }
+                 }
+            }
+
+            // check to see if event has been added, if not, igore it
+            removeEvent(event, fn) {
+                if(this.thing.hasOwnProperty(event)){
+                    this.thing[event].splice(this.thing[event].indexOf(fn), 1)
+                }
+            }
+        }
+
+
+
+
+        //console.log('obj:', obj)
+
+        function handleBoom() {
+            console.log('Boom happened')
+        }
+
+        function handleBoom2() {
+            console.log('Boom! Boom!')
+        }
+
+
+        // obj.addEvent('boom', handleBoom)
+        // obj.addEvent('boom', handleBoom2)
+        // obj.emitEvent('boom') // log 'Boom happened' and 'Boom! Boom!'
+        // obj.removeEvent('boom', handleBoom)
+        // obj.removeEvent('click', handleBoom)
+        // obj.emitEvent('boom') // only log 'Boom! Boom!' 
+        // obj.emitEvent('click', handleBoom)
+ 
+
+        class Button extends EventEmitter2 {
+            constructor() {
+                super()
+                this.enabled = false
+  
+            }
+
+            enable() {
+                if(this.enabled === false ) {
+
+                    // 'this' is the object that lives inside the class 
+                    this.emitEvent('enable')
+                    this.enabled = true
+                }
+            }
+
+            disable() {
+                if(this.enabled === true) {
+                    this.emitEvent('disable')
+                    this.enabled = false
+                }
+            }
+        }
+
+        // const btn = new Button()
+        // console.log('btn', btn)
+
+        //btn.addEvent('enable', () => console.log('enabled'))
+        //btn.addEvent('disable', () => console.log('disabled'))
+
+        //btn.enable() // logs 'enabled'
+        //btn.disable() // logs 'disabled'
+        //btn.enable() // logs 'enabled'
+        //btn.enable() // doesn't log anything because nothing changed, button already enabled.
+
+
+        /**
+         * Next challenge:
+         * 
+         * When using element.addEventListener('click', (evt) => { console.log(evt) })
+         * The callback gets an event object. 
+         * 
+         * Update EventEmitter to pass an event object
+         * 
+         * const obj = new EventEmitter()
+         * 
+         * obj.addEvent('boom', (evt) => { console.log(evt) })
+         * 
+         * obj.emitEvent('boom', { description: 'I am the event object' })
+         * // log { description: 'I am the event object' }
+         * 
+         */
+
+    
+        class EventEmitter3 {
+
+            // need the contructor but does not pass down any value 
+            constructor() {
+                this.thing = {}
+            }
+
+
+            // save the function for the name 
+            // {event: funtion}
+            addEvent(event, fn) {
+                
+                if(this.thing.hasOwnProperty(event) === false){
+                    this.thing[event] = []
+                }
+
+                if(this.thing[event].indexOf(fn) === -1){
+                    this.thing[event].push(fn)
+                }
+    
+                return this
+                
+                // console.log('fn:', this.thing[event])
+                // console.log('obj:', obj)
+            }
+
+            // check to see if event has been added, if not, igore it
+            emitEvent(event, evtObj) {
+                if(this.thing.hasOwnProperty(event)){
+                    // for (let element of this.thing[event]){
+                    //     element(evtObj)
+                    // }
+
+                    this.thing[event].forEach((next) => next(evtObj))
+                 }
+
+                 return this
+            }
+
+            // check to see if event has been added, if not, igore it
+            // removeEvent(event, fn) {
+            //     if(this.thing.hasOwnProperty(event)) {
+            //         this.thing[event].splice(this.thing[event].indexOf(fn), 1)
+            //     }
+            // }
+
+            removeEvent(event, fn) {
+                if(this.thing.hasOwnProperty(event)) {
+                    this.thing[event] = this.thing[event].filter((next) => next !== fn)
+                    console.log(this.thing[event])
+                }
+
+                return this
+            }
+        }
+
+
+        // const obj = new EventEmitter3()
+        // console.log(obj)
+
+        // obj.addEvent('boom', (evt) => { console.log(evt) })
+        // obj.emitEvent('boom', { description: 'I am the event object' })
+
+
+        //  obj.addEvent('boom', handleBoom)
+        //  obj.addEvent('boom', handleBoom2)
+        //  obj.removeEvent('boom', handleBoom)
+        // obj.emitEvent('boom') // only log 'Boom! Boom!' 
+ 
+
+        /**
+         * Refactor:
+         * 
+         * Change 'removeEvent' to use Array.prototype.filter instead of Array.prototype.splice
+         * This is similar to changing 'emitEvent' from using for loop to using 'forEach'.
+         * splice changes the existing array
+         * filter creates a new array with your changes
+         */
+
+
+        class View extends EventEmitter3 {
+            constructor(tagName) {
+                super()
+                this.tagName = tagName
+                this.element = null
+                this.rendered = false
+                this.mounted = false
+            }
+
+            render() {
+                if(this.rendered === false) {
+                    this.emitEvent('willRender')
+                    console.log('this.element:', this.element)
+
+                    this.element = document.createElement(this.tagName)
+                    this.element.innerText = 'I am a list'
+                    this.rendered = true
+                    console.log('this.element:', this.element)
+
+                    this.emitEvent('didRender')
+                }
+                
+                // This will happen over and over again, even if already rendered
+                // What happens in you call render more than once?
+            }
+
+            appendTo(mountingWall) {
+                // Same as above, don't need to add events here
+                
+                if (this.mounted === false) {
+                //if(this.mounted === false && this.rendered === true) {
+                    this.emitEvent('willMount')
+                    this.render()
+                    console.log(mountingWall.appendChild(this.element))
+                    this.mounted = true
+                    
+                    this.emitEvent('didMount')
+                }
+            }
+        }  
+
+        const view = new View('div')
+    
+        console.log('view:', view)
+
+        
+        function willRender() {
+            console.log('NOT rendered')
+        }
+
+        function didRender() {
+            console.log('yay! - already rendered')
+        }
+
+        function willMount() {
+            console.log('NOT mounted')
+        }
+
+        function didMount() {
+            console.log('yay! - already mounted')
+        }
+    
+        view.addEvent('willRender', willRender)
+            .addEvent('willRender', willRender)
+            .addEvent('didRender', didRender)
+            .addEvent('willMount', willMount)
+            .addEvent('didMount', didMount)
+
+        view.render()
+        view.appendTo(document.body)
+        
+        
+        /**
+         * Next Challenge:
+         * 
+         * Add a method called "setContent" that takes a string and makes it the innerText of the
+         * the rendered element. What happens if "setContent" is called before render? In this case
+         * you probably don't want to preemptively render.
+         * 
+         * Add a method called "addChild" to the the "View" class. This method should take one
+         * argument that is another instace of view. When render is called a View should make sure
+         * all of its children are rendered before it is rendered. Similarly, a View should make
+         * sure all children are mounted to it before it is mounted.
+         * 
+         * const view1 = new View('div')
+         * const view2 = new View('div')
+         * const view3 = new View('h1')
+         * view3.setContent('Hi there')
+         * 
+         * view2.addChild(view3)
+         * view1.addChild(view2)
+         * 
+         * view1.render()
+         * view1.appendTo(document.body)
+         */
+
+
+
+    </script>
+</body>
+</html>
