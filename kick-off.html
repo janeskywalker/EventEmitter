@@ -9,7 +9,6 @@
 <body>
     <script>
         /**
-         * Exercise 12
          * 
          * Write a class called 'EventListener'
          * 
@@ -153,7 +152,6 @@
                 this.thing = {}
             }
 
-
             // save the function for the name 
             // {event: funtion}
             addEvent(event, fn) {
@@ -231,79 +229,147 @@
                 super()
                 this.tagName = tagName
                 this.element = null
-                this.rendered = false
-                this.mounted = false
+                this.isRendered = false
+                this.isMounted = false
+                this.content = null
+                this.children = []
+                
             }
 
             render() {
-                if(this.rendered === false) {
+                if(this.isRendered=== false) {
                     this.emitEvent('willRender')
-                    console.log('this.element:', this.element)
 
+                    this.children.forEach((next) => next.render())
                     this.element = document.createElement(this.tagName)
-                    this.element.innerText = 'I am a list'
-                    this.rendered = true
-                    console.log('this.element:', this.element)
-
+                    
+                    this.isRendered= true
                     this.emitEvent('didRender')
                 }
-                
-                // This will happen over and over again, even if already rendered
-                // What happens in you call render more than once?
             }
 
             appendTo(mountingWall) {
-                // Same as above, don't need to add events here
                 
-                if (this.mounted === false) {
-                //if(this.mounted === false && this.rendered === true) {
+                if (this.isMounted === false) {
                     this.emitEvent('willMount')
                     this.render()
-                    console.log(mountingWall.appendChild(this.element))
-                    this.mounted = true
-                    
-                    this.emitEvent('didMount')
+
+                    if (this.content !== null) {
+                        const text = document.createTextNode(this.content)
+                        this.element.appendChild(text)
+                    }
+
+                    this.children.forEach((next) => next.appendTo(this.element))
+                    //this.child.appendTo(this.element)
+
+                    console.log(this.element)
+                    console.log(this.child)
+
+                    // use appendTo
+                    // should't use this: b/c child also has element to append,
+                    //this.element.appendChild(this.child.element)
+                    //this.child.element.innerText = this.child.content
+                
+                    mountingWall.appendChild(this.element)
+
+                    // dont use this. it resets this.element 
+                    // create a text node instead
+                    //this.element.innerText = this.content
+
+                    this.isMounted = true
+                    this.emitEvent('didMount')      
                 }
             }
+
+            setContent(text) {
+                this.content = text
+            }
+
+            addChild(viewInstance){
+                this.children.push(viewInstance)
+            }
+
         }  
 
-        const view = new View('div')
+
+
+
+        //  const view1 = new View('div')
+        //  const view2 = new View('div')
+        //  const view3 = new View('h1')
+         
+        //  view1.setContent('view 1')
+        //  view2.setContent('view 2')
+        //  view3.setContent('view 3')
+         
+        //  view2.addChild(view3)
+        //  view1.addChild(view2)
+         
+        //  view1.render()
+        //  view1.appendTo(document.body) 
+
+
+
+         const view1 = new View('div')
+         const view2 = new View('div')
+         const view3 = new View('h1')
+         
+         view1.setContent('view 1')
+         view2.setContent('view 2')
+         view3.setContent('view 3')
+         
+         view1.addChild(view2)
+         view1.addChild(view3)
+         
+         view1.render()
+         view1.appendTo(document.body) 
+
+
+   
     
-        console.log('view:', view)
+
+        // function willRender() {
+        //     console.log('NOT rendered')
+        // }
+
+        // function didRender() {
+        //     console.log('yay! - already rendered')
+        // }
+
+        // function willMount() {
+        //     console.log('NOT mounted')
+        // }
+
+        // function didMount() {
+        //     console.log('yay! - already mounted')
+        // }
 
         
-        function willRender() {
-            console.log('NOT rendered')
-        }
+        // const view = new View('div')
+        // console.log('view:', view)
 
-        function didRender() {
-            console.log('yay! - already rendered')
-        }
+        // view.addEvent('willRender', willRender)
+        //     .addEvent('willRender', willRender)
+        //     .addEvent('didRender', didRender)
+        //     .addEvent('willMount', willMount)
+        //     .addEvent('didMount', didMount)
 
-        function willMount() {
-            console.log('NOT mounted')
-        }
+                
 
-        function didMount() {
-            console.log('yay! - already mounted')
-        }
-    
-        view.addEvent('willRender', willRender)
-            .addEvent('willRender', willRender)
-            .addEvent('didRender', didRender)
-            .addEvent('willMount', willMount)
-            .addEvent('didMount', didMount)
+ 
 
-        view.render()
-        view.appendTo(document.body)
-        
+
+
         
         /**
          * Next Challenge:
          * 
          * Add a method called "setContent" that takes a string and makes it the innerText of the
-         * the rendered element. What happens if "setContent" is called before render? In this case
-         * you probably don't want to preemptively render.
+         * the rendered element. What happens if "setContent" is called before render? 
+         * 
+         * -- element is null 
+         * 
+         * In this case, you probably don't want to preemptively render.
          * 
          * Add a method called "addChild" to the the "View" class. This method should take one
          * argument that is another instace of view. When render is called a View should make sure
@@ -313,6 +379,7 @@
          * const view1 = new View('div')
          * const view2 = new View('div')
          * const view3 = new View('h1')
+         * 
          * view3.setContent('Hi there')
          * 
          * view2.addChild(view3)
